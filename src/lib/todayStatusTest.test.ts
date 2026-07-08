@@ -6,6 +6,7 @@ import {
   calculateTodayStatusResult,
   todayStatusQuestions,
   todayStatusTypes,
+  type TestOptionKey,
 } from "./todayStatusTest";
 
 describe("today status test", () => {
@@ -77,6 +78,33 @@ describe("today status test", () => {
     expect(actionRecovery.primaryDimension).toBe("action");
     expect(actionRecovery.secondaryDimension).toBe("recovery");
     expect(["行动蓄力期", "压力转化期", "节奏重建期"]).toContain(actionRecovery.status.name);
+  });
+
+  it("varies results for different answer fingerprints within the same dimension pair", () => {
+    const answerSets = [
+      ["C", "C", "C", "C", "C", "C", "A", "A", "A", "A"],
+      ["C", "A", "C", "A", "C", "A", "C", "A", "C", "C"],
+      ["A", "C", "C", "C", "A", "C", "A", "C", "A", "C"],
+    ] as TestOptionKey[][];
+
+    const results = answerSets.map(calculateTodayStatusResult);
+    const statusNames = new Set(results.map((result) => result.status.name));
+
+    results.forEach((result) => {
+      expect(result.primaryDimension).toBe("action");
+      expect(result.secondaryDimension).toBe("recovery");
+    });
+    expect(statusNames.size).toBeGreaterThan(1);
+  });
+
+  it("keeps the same answers stable across repeated calculations", () => {
+    const answers = ["B", "C", "B", "C", "B", "C", "B", "C", "A", "D"] as TestOptionKey[];
+    const first = calculateTodayStatusResult(answers);
+    const second = calculateTodayStatusResult(answers);
+
+    expect(second.status.id).toBe(first.status.id);
+    expect(second.primaryDimension).toBe(first.primaryDimension);
+    expect(second.secondaryDimension).toBe(first.secondaryDimension);
   });
 
   it("exports the requested localStorage keys", () => {

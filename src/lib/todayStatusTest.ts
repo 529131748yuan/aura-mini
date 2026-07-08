@@ -430,6 +430,40 @@ function getRankedDimensions(scores: Record<StatusDimension, number>) {
   return [...order].sort((left, right) => scores[right] - scores[left] || order.indexOf(left) - order.indexOf(right));
 }
 
+function uniqueStatusNames(statusNames: string[]) {
+  return Array.from(new Set(statusNames));
+}
+
+function getAnswerFingerprint(answerKeys: TestOptionKey[]) {
+  const optionWeights: Record<TestOptionKey, number> = {
+    A: 1,
+    B: 3,
+    C: 5,
+    D: 7,
+  };
+
+  return answerKeys.reduce((total, key, index) => total + optionWeights[key] * (index + 1), 0);
+}
+
+function getCandidateStatusNames(
+  scores: Record<StatusDimension, number>,
+  primaryDimension: StatusDimension,
+  secondaryDimension: StatusDimension,
+) {
+  const basePool = statusPools[`${primaryDimension}-${secondaryDimension}`] ?? names;
+  const rankedDimensions = getRankedDimensions(scores);
+  const expandedPool = [...basePool];
+
+  rankedDimensions.forEach((dimension) => {
+    if (dimension === primaryDimension || scores[primaryDimension] - scores[dimension] > 1) return;
+
+    const mixedPool = statusPools[`${primaryDimension}-${dimension}`];
+    if (mixedPool) expandedPool.push(...mixedPool);
+  });
+
+  return uniqueStatusNames(expandedPool);
+}
+
 export function calculateTodayStatusResult(answerKeys: TestOptionKey[]): TodayStatusResult {
   const scores: Record<StatusDimension, number> = {
     recovery: 0,
@@ -443,8 +477,8 @@ export function calculateTodayStatusResult(answerKeys: TestOptionKey[]): TodaySt
   });
 
   const [primaryDimension, secondaryDimension] = getRankedDimensions(scores);
-  const pool = statusPools[`${primaryDimension}-${secondaryDimension}`] ?? names;
-  const statusName = pool[answerKeys.length % pool.length];
+  const pool = getCandidateStatusNames(scores, primaryDimension, secondaryDimension);
+  const statusName = pool[getAnswerFingerprint(answerKeys) % pool.length];
   const status = todayStatusTypes.find((item) => item.name === statusName) ?? todayStatusTypes[0];
 
   return {

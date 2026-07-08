@@ -6,7 +6,6 @@ import {
   Home,
   Lock,
   MessageCircle,
-  RefreshCw,
   Share2,
   Sparkles,
   UserRound,
@@ -604,7 +603,6 @@ function TodayPage({
   isTesting,
   isGeneratingTodayAnalysis,
   onStart,
-  onRetest,
   onAnswer,
   onPrevious,
   onNext,
@@ -623,7 +621,6 @@ function TodayPage({
   isTesting: boolean;
   isGeneratingTodayAnalysis: boolean;
   onStart: () => void;
-  onRetest: () => void;
   onAnswer: (answer: TestOptionKey) => void;
   onPrevious: () => void;
   onNext: () => void;
@@ -803,12 +800,6 @@ function TodayPage({
           onClick={onShare}
         >
           <Share2 size={16} /> 生成分享卡
-        </button>
-        <button
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white/72 px-5 py-3 text-sm font-semibold text-[#3478f6] transition active:scale-[0.98]"
-          onClick={onRetest}
-        >
-          <RefreshCw size={16} /> 重新测试
         </button>
       </section>
 
@@ -1265,17 +1256,6 @@ export default function MiniPage() {
     setCurrentQuestionIndex(0);
   }
 
-  function handleRetest() {
-    const emptyAnswers = Array(todayStatusQuestions.length).fill(null) as Array<TestOptionKey | null>;
-    setTestAnswers(emptyAnswers);
-    setTodayStatusResult(null);
-    setCurrentQuestionIndex(0);
-    setIsTesting(true);
-    persistAnswers(emptyAnswers);
-    window.localStorage.removeItem(AURA_TODAY_TEST_RESULT_KEY);
-    window.localStorage.removeItem(AURA_TODAY_TEST_DATE_KEY);
-  }
-
   function handleAnswer(answer: TestOptionKey) {
     const nextAnswers = [...testAnswers];
     nextAnswers[currentQuestionIndex] = answer;
@@ -1419,7 +1399,6 @@ export default function MiniPage() {
               isTesting={isTesting}
               isGeneratingTodayAnalysis={isGeneratingTodayAnalysis}
               onStart={handleStartTest}
-              onRetest={handleRetest}
               onAnswer={handleAnswer}
               onPrevious={() => setCurrentQuestionIndex((index) => Math.max(index - 1, 0))}
               onNext={() => setCurrentQuestionIndex((index) => Math.min(index + 1, todayStatusQuestions.length - 1))}
