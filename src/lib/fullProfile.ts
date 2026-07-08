@@ -111,6 +111,42 @@ function getRecentStateFocus(recentState: RecentState) {
   return "最近 30 天整体稳定，说明你有一定自我调节能力，只是遇到关键关系或压力时仍会被牵动。";
 }
 
+function getImmersiveProfileDetails(form: FullProfileFormData) {
+  const relationDetail =
+    form.mainConcern === "感情" || form.mainConcern === "婚姻"
+      ? "如果消息没有及时回、语气突然变淡、约好的事被临时改变，你表面可能会说没事，心里却会开始反复确认：是不是我哪里做得不够好，是不是对方没有那么在意我。你真正难受的不是一条消息，而是那一刻你感觉自己的位置变得不确定。"
+      : "当别人一句评价、一个临时安排、一次没有说明原因的否定落到你这里，你会先把它消化成自己的责任。你不一定会当场反驳，但会在心里快速复盘：我是不是还不够稳，是不是应该再努力一点。";
+
+  const recentDetail =
+    form.recentState === "经常内耗"
+      ? "你最近最明显的消耗，是白天撑住、晚上复盘。白天你可以把事情处理得像没问题一样，到了安静下来以后，很多细节又会重新浮上来：一句话、一个表情、一个没有解释清楚的停顿，都可能被你在心里反复翻看。"
+      : form.recentState === "容易焦虑"
+        ? "你最近更容易被不确定牵动，只要事情没有明确结果，你就会想提前准备所有可能性。看起来是在做准备，其实内在能量一直处在被拉紧的状态。"
+        : form.recentState === "容易疲惫"
+          ? "你最近不是不想变好，而是恢复速度变慢了。很多时候你刚把自己撑起来，又被新的沟通、新的任务、新的期待消耗掉，所以会有一种怎么休息都没真正缓过来的感觉。"
+          : "你最近其实已经在努力把自己带回稳定，只是旧的反应还会偶尔出现：一遇到重要关系或重要评价，你还是会本能地先紧一下，再判断自己能不能放松。";
+
+  const relationshipStatusDetail =
+    form.relationshipStatus === "关系复杂"
+      ? "关系不确定时，你最容易被对方的节奏牵着走：靠近一点你会重新燃起期待，退远一点你又会怀疑自己是不是不该在意。真正需要被整理的，是你在这段关系里有没有足够清楚的位置。"
+      : "你在关系里常常想解释又怕麻烦，想表达又怕被说太敏感，于是很多话会被你压成一句“算了”。可那些没说出口的感受并不会消失，它们会变成冷淡、疲惫，或者某一天突然爆发出来。";
+
+  return {
+    fixedAura:
+      "更深一层看，你的底层气场不是单纯敏感，而是很会读取变化。别人还没有明确表达出来的情绪，你往往已经先感受到了；别人觉得只是小事，你却会自然地把它放进关系、责任和自我价值里一起判断。所以你不是想太多，你只是接收得太细、承接得太快。",
+    currentState: `${recentDetail}${relationDetail}这会让你很容易出现一种“外面还在正常运转，里面已经很累”的状态。`,
+    psychology:
+      "这套反应链路的底层逻辑是：你越在意，就越想提前判断；越想判断，就越容易消耗；越消耗，就越需要确认。于是你会在关系、工作或家庭里反复进入同一种循环：先观察，后忍住，再复盘，最后开始怀疑自己。真正要调整的不是让你变得迟钝，而是让你学会把外界变化和自己的价值分开。",
+    relationshipPattern: `${relationshipStatusDetail}你需要的不是被哄一时，而是一种稳定的回应感：对方能不能认真听你说，能不能在关键时刻给你明确态度，能不能让你不用一直靠猜来维持安全感。`,
+    emotionActionPattern:
+      "当你内在很乱时，强迫自己立刻高效只会让消耗更重。你适合先把情绪里的噪音降下来，再做小动作。比如先回一条必须回的消息、先完成一个十分钟任务、先把今天最卡住你的念头写下来。你一旦重新获得一点点完成感，行动力就会慢慢回来。",
+    environmentImpact:
+      "如果这段时间沟通密度高、休息被打断、身边人的情绪也不稳定，你会比平时更容易被影响。不是你变脆弱了，而是你的气场本来就容易捕捉环境细节，当环境持续嘈杂时，你需要比别人更多的独处和降噪。",
+    masterPrompt:
+      "如果你看到这里心里已经浮现出某个人、某句话或某个选择，说明真正牵动你的不是泛泛的状态，而是一个具体结。这个结适合继续追问，因为它往往藏着你反复进入相似状态的入口。",
+  };
+}
+
 export function getFullProfileReportLength(result: FullProfileResult) {
   return [
     result.title,
@@ -218,32 +254,41 @@ export function generateFullProfile(form: FullProfileFormData, todayContext?: Fu
   };
 
   const intro = "结合基础资料、当前状态、关系模式、外部环境与气场反应，生成你的个人气场解析。这不是简单标签，而是关于“你为什么会这样”的分析。";
+  const immersiveDetails = getImmersiveProfileDetails(form);
+  const enhancedFixedAura = `${fixedAura}${immersiveDetails.fixedAura}`;
+  const enhancedCurrentState = `${currentState}${immersiveDetails.currentState}`;
+  const enhancedPsychology = `${psychology}${immersiveDetails.psychology}`;
+  const enhancedRelationshipPattern = `${relationshipPattern}${immersiveDetails.relationshipPattern}`;
+  const enhancedEmotionActionPattern = `${emotionActionPattern}${immersiveDetails.emotionActionPattern}`;
+  const enhancedEnvironmentImpact = `${environmentImpact}${immersiveDetails.environmentImpact}`;
+  const enhancedMasterPrompt = `${masterPrompt}${immersiveDetails.masterPrompt}`;
+
   const sections: FullProfileSection[] = [
-    { title: "一、你的固定气场：你天生更容易被什么影响", content: fixedAura, highlight: "敏感不是缺点，它让你更会照顾人，也更容易察觉问题。" },
-    { title: "二、你现在处在什么状态", content: currentState, highlight: "这不是能力问题，而是内在能量分配问题。" },
-    { title: "三、从气场流向看，你为什么会反复这样", content: psychology, highlight: "你不是软弱，而是太习惯替关系和结果负责。" },
-    { title: "四、你的关系模式：为什么你容易在关系里累", content: relationshipPattern, highlight: "你真正需要的是稳定、明确、可感知的回应。" },
-    { title: "五、你的情绪和行动节奏", content: emotionActionPattern, highlight: "你的行动力来自内在确认感，而不是外界催促。" },
-    { title: "六、环境正在怎样影响你", content: environmentImpact, highlight: "环境不会决定你，但会影响你的恢复速度。" },
+    { title: "一、你的固定气场：你天生更容易被什么影响", content: enhancedFixedAura, highlight: "敏感不是缺点，它让你更会照顾人，也更容易察觉问题。" },
+    { title: "二、你现在处在什么状态", content: enhancedCurrentState, highlight: "这不是能力问题，而是内在能量分配问题。" },
+    { title: "三、从气场流向看，你为什么会反复这样", content: enhancedPsychology, highlight: "你不是软弱，而是太习惯替关系和结果负责。" },
+    { title: "四、你的关系模式：为什么你容易在关系里累", content: enhancedRelationshipPattern, highlight: "你真正需要的是稳定、明确、可感知的回应。" },
+    { title: "五、你的情绪和行动节奏", content: enhancedEmotionActionPattern, highlight: "你的行动力来自内在确认感，而不是外界催促。" },
+    { title: "六、环境正在怎样影响你", content: enhancedEnvironmentImpact, highlight: "环境不会决定你，但会影响你的恢复速度。" },
     { title: "七、接下来 7 天，你应该怎么顺势调整", content: "今天开始、3 天内、7 天内分三层调整：先降消耗，再恢复节奏，最后整理关系和目标。", highlight: "不要急着翻盘，先把自己从内耗里慢慢带回来。" },
-    { title: "如果你还有一个放不下的问题", content: masterPrompt, highlight: "具体的人、选择和反复出现的问题，适合继续问大师。" },
+    { title: "如果你还有一个放不下的问题", content: enhancedMasterPrompt, highlight: "具体的人、选择和反复出现的问题，适合继续问大师。" },
   ];
 
   return sanitizeFullProfileResult({
     title: "你的完整人生档案",
     subtitle: "结合基础资料、当前状态、关系模式、外部环境与气场反应，生成你的个人气场解析。",
     intro,
-    fixedAura,
-    currentState,
-    psychology,
-    relationshipPattern,
-    emotionActionPattern,
-    environmentImpact,
+    fixedAura: enhancedFixedAura,
+    currentState: enhancedCurrentState,
+    psychology: enhancedPsychology,
+    relationshipPattern: enhancedRelationshipPattern,
+    emotionActionPattern: enhancedEmotionActionPattern,
+    environmentImpact: enhancedEnvironmentImpact,
     sevenDayAdvice,
-    masterPrompt,
+    masterPrompt: enhancedMasterPrompt,
     sections,
-    personality: fixedAura,
-    emotionTrajectory: currentState,
+    personality: enhancedFixedAura,
+    emotionTrajectory: enhancedCurrentState,
     advice: sevenDayAdvice.sevenDays.join(""),
     mainConcern: form.mainConcern,
     generatedAt: new Date().toISOString(),

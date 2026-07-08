@@ -49,9 +49,12 @@ describe("full profile unlock flow", () => {
     expect(result.sevenDayAdvice.today).toHaveLength(3);
     expect(result.sevenDayAdvice.threeDays).toHaveLength(3);
     expect(result.sevenDayAdvice.sevenDays).toHaveLength(3);
-    expect(getFullProfileReportLength(result)).toBeGreaterThanOrEqual(1500);
+    expect(getFullProfileReportLength(result)).toBeGreaterThanOrEqual(2200);
     expect(result.mainConcern).toBe("感情");
     expect(result.generatedAt).toBeTruthy();
+    expect(JSON.stringify(result)).toContain("消息没有及时回");
+    expect(JSON.stringify(result)).toContain("白天撑住");
+    expect(JSON.stringify(result)).toContain("想解释又怕麻烦");
     expect(JSON.stringify(result)).not.toContain("心理学");
     expect(JSON.stringify(result)).not.toContain("心理");
     expect(JSON.stringify(result)).not.toContain("出生信息");
