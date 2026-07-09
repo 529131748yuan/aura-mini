@@ -262,10 +262,12 @@ export function generateFullProfile(form: FullProfileFormData, todayContext?: Fu
   const enhancedEmotionActionPattern = `${emotionActionPattern}${immersiveDetails.emotionActionPattern}`;
   const enhancedEnvironmentImpact = `${environmentImpact}${immersiveDetails.environmentImpact}`;
   const enhancedMasterPrompt = `${masterPrompt}${immersiveDetails.masterPrompt}`;
+  const innateAura = `天生固有气场，是根据基础资料推导出的固定命盘倾向。它不代表命运被写死，而是说明你更容易用哪种方式感受世界、回应关系、启动行动。${enhancedFixedAura}`;
+  const acquiredAura = `后天形成气场，是最近状态、关系牵引、现实压力和外部环境共同叠加出来的流动状态。它会随着休息、选择、关系回应和节奏调整而变化。${enhancedCurrentState}`;
 
   const sections: FullProfileSection[] = [
-    { title: "一、你的固定气场：你天生更容易被什么影响", content: enhancedFixedAura, highlight: "敏感不是缺点，它让你更会照顾人，也更容易察觉问题。" },
-    { title: "二、你现在处在什么状态", content: enhancedCurrentState, highlight: "这不是能力问题，而是内在能量分配问题。" },
+    { title: "一、天生固有气场：你的固定命盘倾向", content: innateAura, highlight: "敏感不是缺点，它让你更会照顾人，也更容易察觉问题。" },
+    { title: "二、后天形成气场：你最近为什么会这样", content: acquiredAura, highlight: "这不是能力问题，而是内在能量分配问题。" },
     { title: "三、从气场流向看，你为什么会反复这样", content: enhancedPsychology, highlight: "你不是软弱，而是太习惯替关系和结果负责。" },
     { title: "四、你的关系模式：为什么你容易在关系里累", content: enhancedRelationshipPattern, highlight: "你真正需要的是稳定、明确、可感知的回应。" },
     { title: "五、你的情绪和行动节奏", content: enhancedEmotionActionPattern, highlight: "你的行动力来自内在确认感，而不是外界催促。" },
@@ -278,8 +280,8 @@ export function generateFullProfile(form: FullProfileFormData, todayContext?: Fu
     title: "你的完整人生档案",
     subtitle: "结合基础资料、当前状态、关系模式、外部环境与气场反应，生成你的个人气场解析。",
     intro,
-    fixedAura: enhancedFixedAura,
-    currentState: enhancedCurrentState,
+    fixedAura: innateAura,
+    currentState: acquiredAura,
     psychology: enhancedPsychology,
     relationshipPattern: enhancedRelationshipPattern,
     emotionActionPattern: enhancedEmotionActionPattern,
@@ -287,8 +289,8 @@ export function generateFullProfile(form: FullProfileFormData, todayContext?: Fu
     sevenDayAdvice,
     masterPrompt: enhancedMasterPrompt,
     sections,
-    personality: enhancedFixedAura,
-    emotionTrajectory: enhancedCurrentState,
+    personality: innateAura,
+    emotionTrajectory: acquiredAura,
     advice: sevenDayAdvice.sevenDays.join(""),
     mainConcern: form.mainConcern,
     generatedAt: new Date().toISOString(),

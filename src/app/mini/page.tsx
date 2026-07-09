@@ -13,6 +13,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   allStoryCategory,
+  generateTodayMasterAnswer,
   getAdjacentStoryCategory,
   getStoryCategoryTabs,
   selectStoriesByCategory,
@@ -43,7 +44,7 @@ import {
   type TodayStatusResult,
 } from "@/lib/todayStatusTest";
 
-type TabKey = "today" | "stories" | "profile";
+type TabKey = "today" | "profile";
 
 function getTodayStorageDate() {
   const now = new Date();
@@ -97,6 +98,16 @@ const fullProfileBenefits = [
   "环境影响解析",
   "7 天顺势调整建议",
   "大师解惑入口",
+];
+
+const debugResetStorageKeys = [
+  AURA_TODAY_TEST_ANSWERS_KEY,
+  AURA_TODAY_TEST_RESULT_KEY,
+  AURA_TODAY_TEST_DATE_KEY,
+  AURA_FULL_PROFILE_UNLOCKED_KEY,
+  AURA_FULL_PROFILE_FORM_KEY,
+  AURA_FULL_PROFILE_RESULT_KEY,
+  AURA_FULL_PROFILE_LEGACY_RESULT_KEY,
 ];
 
 function getSummaryText(text: string, maxLength = 72) {
@@ -314,6 +325,64 @@ function QuestionModal({
           onClick={onClose}
         >
           收起
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function TodayMasterModal({
+  open,
+  question,
+  answer,
+  onQuestionChange,
+  onGenerate,
+  onClose,
+}: {
+  open: boolean;
+  question: string;
+  answer: string;
+  onQuestionChange: (question: string) => void;
+  onGenerate: () => void;
+  onClose: () => void;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#5c5266]/28 px-4 pb-5 backdrop-blur-sm">
+      <div className="aura-card max-h-[88vh] w-full max-w-[390px] overflow-y-auto rounded-[28px] p-5 aura-scrollbar">
+        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#eef4ff] text-[#3478f6]">
+          <Sparkles size={20} />
+        </div>
+        <h3 className="text-xl font-semibold text-[#1d1d1f]">今日 AI 大师解惑</h3>
+        <p className="mt-2 text-sm leading-6 text-[#6e6e73]">
+          围绕今天的状态，先问一个你最放不下的问题。
+        </p>
+        <textarea
+          className="mt-4 h-28 w-full resize-none rounded-[18px] border border-white/80 bg-white/68 px-4 py-3 text-sm leading-6 text-[#1d1d1f] outline-none focus:border-[#3478f6]"
+          maxLength={120}
+          placeholder="例如：他为什么突然不回我消息？ / 我现在要不要换工作？"
+          value={question}
+          onChange={(event) => onQuestionChange(event.target.value)}
+        />
+        <div className="mt-1 text-right text-xs text-[#86868b]">{question.length}/120</div>
+        {answer ? (
+          <div className="mt-4 rounded-[18px] bg-[#eef4ff] p-4 text-sm leading-7 text-[#3a3a3c]">
+            {answer}
+          </div>
+        ) : null}
+        <button
+          className="aura-primary mt-5 w-full rounded-full px-5 py-3 text-sm font-semibold transition active:scale-[0.98] disabled:opacity-45"
+          disabled={!question.trim()}
+          onClick={onGenerate}
+        >
+          生成大师解读
+        </button>
+        <button
+          className="mt-3 w-full rounded-full bg-white/72 px-5 py-3 text-sm font-semibold text-[#3478f6] transition active:scale-[0.98]"
+          onClick={onClose}
+        >
+          稍后再问
         </button>
       </div>
     </div>
@@ -608,6 +677,7 @@ function TodayPage({
   onNext,
   onGenerate,
   onShare,
+  onAskMaster,
   fullProfileStage,
   fullProfileResult,
   onPayUnlock,
@@ -626,6 +696,7 @@ function TodayPage({
   onNext: () => void;
   onGenerate: () => void;
   onShare: () => void;
+  onAskMaster: () => void;
   fullProfileStage: ReturnType<typeof getFullProfileStage>;
   fullProfileResult: FullProfileResult | null;
   onPayUnlock: () => void;
@@ -800,6 +871,19 @@ function TodayPage({
           onClick={onShare}
         >
           <Share2 size={16} /> 生成分享卡
+        </button>
+      </section>
+
+      <section className="aura-card rounded-[24px] p-5">
+        <SectionTitle
+          title="今日 AI 大师解惑已解锁"
+          subtitle="围绕今天的状态，你可以先问一个最放不下的问题。"
+        />
+        <button
+          className="aura-primary w-full rounded-full px-5 py-3 text-sm font-semibold transition active:scale-[0.98]"
+          onClick={onAskMaster}
+        >
+          问 AI 大师继续解惑
         </button>
       </section>
 
@@ -1031,6 +1115,7 @@ function ProfilePage({
   onFreeUnlock,
   onFillProfile,
   onAppFeature,
+  onDebugReset,
 }: {
   todayStatusResult: TodayStatusResult | null;
   fullProfileStage: ReturnType<typeof getFullProfileStage>;
@@ -1039,6 +1124,7 @@ function ProfilePage({
   onFreeUnlock: () => void;
   onFillProfile: () => void;
   onAppFeature: () => void;
+  onDebugReset: () => void;
 }) {
   const profileKeywords = getProfileKeywords(todayStatusResult);
 
@@ -1136,6 +1222,16 @@ function ProfilePage({
           </>
         ) : null}
       </section>
+
+      <section className="aura-card rounded-[24px] p-5">
+        <SectionTitle title="调试工具" subtitle="仅用于体验版反复测试不同结果。" />
+        <button
+          className="w-full rounded-full border border-[#d69ab3]/35 bg-white/72 px-5 py-3 text-sm font-semibold text-[#b85d7a] transition active:scale-[0.98]"
+          onClick={onDebugReset}
+        >
+          调试：重置体验数据
+        </button>
+      </section>
     </div>
   );
 }
@@ -1143,12 +1239,11 @@ function ProfilePage({
 function BottomTabs({ active, onChange }: { active: TabKey; onChange: (tab: TabKey) => void }) {
   const tabs = [
     { key: "today" as const, label: "今日", icon: Home },
-    { key: "stories" as const, label: "众生", icon: Sparkles },
     { key: "profile" as const, label: "我的", icon: UserRound },
   ];
 
   return (
-    <nav className="fixed bottom-4 left-1/2 z-30 grid w-[calc(100%-32px)] max-w-[358px] -translate-x-1/2 grid-cols-3 rounded-full bg-white/78 p-1.5 shadow-aura backdrop-blur-xl">
+    <nav className="fixed bottom-4 left-1/2 z-30 grid w-[calc(100%-32px)] max-w-[358px] -translate-x-1/2 grid-cols-2 rounded-full bg-white/78 p-1.5 shadow-aura backdrop-blur-xl">
       {tabs.map(({ key, label, icon: Icon }) => (
         <button
           key={key}
@@ -1185,6 +1280,9 @@ export default function MiniPage() {
   const [todayStatusResult, setTodayStatusResult] = useState<TodayStatusResult | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [appMessage, setAppMessage] = useState("");
+  const [todayMasterOpen, setTodayMasterOpen] = useState(false);
+  const [todayMasterQuestion, setTodayMasterQuestion] = useState("");
+  const [todayMasterAnswer, setTodayMasterAnswer] = useState("");
   const [toastMessage, setToastMessage] = useState("");
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [appUnlockOpen, setAppUnlockOpen] = useState(false);
@@ -1387,6 +1485,41 @@ export default function MiniPage() {
     setToastMessage("该功能将在 App 中开放。");
   }
 
+  function handleGenerateTodayMasterAnswer() {
+    if (!todayStatusResult) return;
+
+    setTodayMasterAnswer(
+      generateTodayMasterAnswer({
+        question: todayMasterQuestion,
+        statusName: todayStatusResult.status.name,
+        resultTitle: todayStatusResult.status.resultTitle,
+        quote: todayStatusResult.status.quote,
+      }),
+    );
+  }
+
+  function handleDebugReset() {
+    debugResetStorageKeys.forEach((key) => window.localStorage.removeItem(key));
+    setTestAnswers(Array(todayStatusQuestions.length).fill(null));
+    setCurrentQuestionIndex(0);
+    setIsTesting(false);
+    setIsGeneratingTodayAnalysis(false);
+    setTodayStatusResult(null);
+    setShareOpen(false);
+    setPaymentOpen(false);
+    setAppUnlockOpen(false);
+    setFullProfileFormOpen(false);
+    setFullProfileUnlocked(false);
+    setFullProfileForm(initialFullProfileForm);
+    setFullProfileResult(null);
+    setIsGeneratingFullProfile(false);
+    setTodayMasterOpen(false);
+    setTodayMasterQuestion("");
+    setTodayMasterAnswer("");
+    setActiveTab("today");
+    setToastMessage("已重置体验数据，可以重新测试");
+  }
+
   return (
     <main className="min-h-screen px-4 py-4">
       <div className="mx-auto min-h-screen w-full max-w-[390px] overflow-hidden">
@@ -1404,6 +1537,7 @@ export default function MiniPage() {
               onNext={() => setCurrentQuestionIndex((index) => Math.min(index + 1, todayStatusQuestions.length - 1))}
               onGenerate={handleGenerateStatusReport}
               onShare={() => setShareOpen(true)}
+              onAskMaster={() => setTodayMasterOpen(true)}
               fullProfileStage={fullProfileStage}
               fullProfileResult={fullProfileResult}
               onPayUnlock={() => setPaymentOpen(true)}
@@ -1412,7 +1546,6 @@ export default function MiniPage() {
               onAppFeature={handleAppFeatureToast}
             />
           ) : null}
-          {activeTab === "stories" ? <StoriesPage onNeedApp={setAppMessage} /> : null}
           {activeTab === "profile" ? (
             <ProfilePage
               todayStatusResult={todayStatusResult}
@@ -1422,6 +1555,7 @@ export default function MiniPage() {
               onFreeUnlock={() => setAppUnlockOpen(true)}
               onFillProfile={() => setFullProfileFormOpen(true)}
               onAppFeature={handleAppFeatureToast}
+              onDebugReset={handleDebugReset}
             />
           ) : null}
         </div>
@@ -1430,6 +1564,17 @@ export default function MiniPage() {
       <BottomSafeFade />
       <BottomTabs active={activeTab} onChange={setActiveTab} />
       <ShareModal open={shareOpen} result={todayStatusResult} onClose={() => setShareOpen(false)} />
+      <TodayMasterModal
+        open={todayMasterOpen}
+        question={todayMasterQuestion}
+        answer={todayMasterAnswer}
+        onQuestionChange={(question) => {
+          setTodayMasterQuestion(question);
+          setTodayMasterAnswer("");
+        }}
+        onGenerate={handleGenerateTodayMasterAnswer}
+        onClose={() => setTodayMasterOpen(false)}
+      />
       <AppGuideModal open={Boolean(appMessage)} message={appMessage} onClose={() => setAppMessage("")} />
       <PaymentModal open={paymentOpen} onConfirm={handlePaymentSuccess} onClose={() => setPaymentOpen(false)} />
       <AppUnlockModal

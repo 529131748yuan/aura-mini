@@ -42,7 +42,10 @@ describe("full profile unlock flow", () => {
     expect(result.title).toBe("你的完整人生档案");
     expect(result.sections).toHaveLength(8);
     expect(result.fixedAura).toContain("基础资料");
+    expect(result.fixedAura).toContain("天生固有气场");
+    expect(result.fixedAura).toContain("固定命盘倾向");
     expect(result.currentState).toContain("关系敏感期");
+    expect(result.currentState).toContain("后天形成气场");
     expect(result.currentState).toContain("经常内耗");
     expect(result.relationshipPattern).toContain("回应");
     expect(result.environmentImpact).toContain("外部环境");
