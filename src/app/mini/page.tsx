@@ -24,6 +24,7 @@ import {
   AURA_FULL_PROFILE_RESULT_KEY,
   AURA_FULL_PROFILE_UNLOCKED_KEY,
   generateFullProfile,
+  getFullProfileAgeGate,
   getFullProfileStage,
   mainConcernOptions,
   recentStateOptions,
@@ -1383,6 +1384,13 @@ export default function MiniPage() {
   }
 
   async function handleGenerateFullProfile() {
+    const ageGate = getFullProfileAgeGate(fullProfileForm.birthDate);
+
+    if (!ageGate.allowed) {
+      setToastMessage(ageGate.message);
+      return;
+    }
+
     const todayTestResult = todayStatusResult
       ? {
           statusName: todayStatusResult.status.name,

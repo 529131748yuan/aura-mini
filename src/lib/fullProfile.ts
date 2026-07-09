@@ -2,6 +2,8 @@ export const AURA_FULL_PROFILE_UNLOCKED_KEY = "auraFullProfileUnlocked";
 export const AURA_FULL_PROFILE_FORM_KEY = "auraFullProfileForm";
 export const AURA_FULL_PROFILE_RESULT_KEY = "auraFullProfileData";
 export const AURA_FULL_PROFILE_LEGACY_RESULT_KEY = "auraFullProfileResult";
+export const FULL_PROFILE_MIN_AGE = 12;
+export const FULL_PROFILE_UNDERAGE_MESSAGE = "气场尚未成型，无法提早解读";
 
 export type RelationshipStatus = "单身" | "恋爱中" | "已婚" | "关系复杂" | "不想说";
 export type MainConcern = "感情" | "婚姻" | "工作" | "财富" | "家庭" | "情绪" | "自我成长";
@@ -69,6 +71,28 @@ export type FullProfileResult = {
 export const relationshipStatusOptions: RelationshipStatus[] = ["单身", "恋爱中", "已婚", "关系复杂", "不想说"];
 export const mainConcernOptions: MainConcern[] = ["感情", "婚姻", "工作", "财富", "家庭", "情绪", "自我成长"];
 export const recentStateOptions: RecentState[] = ["稳定", "容易焦虑", "容易疲惫", "经常内耗", "状态变好"];
+
+export function getFullProfileAgeGate(birthDate: string, now = new Date()) {
+  const [year, month, day] = birthDate.split("-").map(Number);
+
+  if (!year || !month || !day) {
+    return { allowed: false, age: null, message: "请先填写出生日期" };
+  }
+
+  let age = now.getFullYear() - year;
+  const currentMonth = now.getMonth() + 1;
+  const currentDay = now.getDate();
+
+  if (currentMonth < month || (currentMonth === month && currentDay < day)) {
+    age -= 1;
+  }
+
+  return {
+    allowed: age >= FULL_PROFILE_MIN_AGE,
+    age,
+    message: age >= FULL_PROFILE_MIN_AGE ? "" : FULL_PROFILE_UNDERAGE_MESSAGE,
+  };
+}
 
 export function getFullProfileStage(unlocked: boolean, result: FullProfileResult | null): FullProfileStage {
   if (result) return "generated";

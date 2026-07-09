@@ -4,6 +4,7 @@ import {
   AURA_FULL_PROFILE_RESULT_KEY,
   AURA_FULL_PROFILE_UNLOCKED_KEY,
   generateFullProfile,
+  getFullProfileAgeGate,
   getFullProfileReportLength,
   getFullProfileStage,
   sanitizeFullProfileResult,
@@ -24,6 +25,15 @@ describe("full profile unlock flow", () => {
     expect(AURA_FULL_PROFILE_UNLOCKED_KEY).toBe("auraFullProfileUnlocked");
     expect(AURA_FULL_PROFILE_FORM_KEY).toBe("auraFullProfileForm");
     expect(AURA_FULL_PROFILE_RESULT_KEY).toBe("auraFullProfileData");
+  });
+
+  it("blocks full profile generation before age twelve", () => {
+    const underTwelve = getFullProfileAgeGate("2018-07-10", new Date("2026-07-09T00:00:00Z"));
+    const alreadyTwelve = getFullProfileAgeGate("2014-07-09", new Date("2026-07-09T00:00:00Z"));
+
+    expect(underTwelve.allowed).toBe(false);
+    expect(underTwelve.message).toBe("气场尚未成型，无法提早解读");
+    expect(alreadyTwelve.allowed).toBe(true);
   });
 
   it("derives the full profile stage from unlock and result state", () => {
