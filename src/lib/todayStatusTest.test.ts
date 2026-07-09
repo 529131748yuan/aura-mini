@@ -20,6 +20,8 @@ describe("today status test", () => {
     const result = calculateTodayStatusResult(["B", "B", "B", "B", "B", "B", "B", "B", "B", "B"]);
 
     expect(result.scores.relationship).toBe(10);
+    expect(result.testProfile.relationshipPattern).toContain("回应");
+    expect(result.testProfile.answerPattern).toBe("BBBBBBBBBB");
     expect(result.status.name).toBeTruthy();
     expect(result.status.resultTitle).toBeTruthy();
     expect(result.status.deepAnalysis.length).toBeGreaterThanOrEqual(250);
@@ -30,6 +32,30 @@ describe("today status test", () => {
     expect(result.status.traits).toHaveLength(3);
     expect(result.status.suitable).toHaveLength(3);
     expect(result.status.avoid).toHaveLength(3);
+  });
+
+  it("builds a structured today profile for the full profile report", () => {
+    const result = calculateTodayStatusResult(["A", "B", "C", "D", "A", "B", "C", "D", "A", "B"]);
+
+    expect(result.testProfile.energyPattern).toBeTruthy();
+    expect(result.testProfile.relationshipPattern).toBeTruthy();
+    expect(result.testProfile.pressurePattern).toBeTruthy();
+    expect(result.testProfile.actionPattern).toBeTruthy();
+    expect(result.testProfile.innerTrigger).toBeTruthy();
+    expect(result.testProfile.answerPattern).toBe("ABCDABCDAB");
+  });
+
+  it("separates obvious answer branches into different status results", () => {
+    const branches = [
+      ["A", "A", "A", "A", "A", "A", "A", "A", "A", "A"],
+      ["B", "B", "B", "B", "B", "B", "B", "B", "B", "B"],
+      ["C", "C", "C", "C", "C", "C", "C", "C", "C", "C"],
+      ["D", "D", "D", "D", "D", "D", "D", "D", "D", "D"],
+    ] as TestOptionKey[][];
+
+    const statusNames = new Set(branches.map((answers) => calculateTodayStatusResult(answers).status.name));
+
+    expect(statusNames.size).toBe(4);
   });
 
   it("gives every status the expanded report content structure", () => {

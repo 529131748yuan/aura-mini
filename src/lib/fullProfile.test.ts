@@ -37,6 +37,14 @@ describe("full profile unlock flow", () => {
       statusName: "关系敏感期",
       statusTitle: "习惯照顾别人，却忘了照顾自己",
       statusSummary: "你今天对关系里的语气、回应和距离格外敏感，真正需要的是被认真理解。",
+      testProfile: {
+        energyPattern: "情绪压住型：心里有话但暂时不想摊开，更需要被温和理解",
+        relationshipPattern: "回应确认型：你更在意对方有没有认真回应你、理解你",
+        pressurePattern: "求助犹豫型：想找人说，又担心打扰别人或显得麻烦",
+        actionPattern: "理解补能型：你需要被理解，一旦有人接住你，行动感会回来",
+        innerTrigger: "关系牵引型：今天最容易被一段关系牵动，回应和距离会影响你",
+        answerPattern: "BBBBBBBBBB",
+      },
     });
 
     expect(result.title).toBe("你的完整人生档案");
@@ -45,6 +53,9 @@ describe("full profile unlock flow", () => {
     expect(result.fixedAura).toContain("天生固有气场");
     expect(result.fixedAura).toContain("固定命盘倾向");
     expect(result.currentState).toContain("关系敏感期");
+    expect(result.currentState).toContain("今日显化气场");
+    expect(result.currentState).toContain("回应确认型");
+    expect(result.currentState).toContain("关系牵引型");
     expect(result.currentState).toContain("后天形成气场");
     expect(result.currentState).toContain("经常内耗");
     expect(result.relationshipPattern).toContain("回应");

@@ -24,8 +24,12 @@ export function fullProfileToApiResult(result: FullProfileResult) {
   };
 }
 
-export function normalizeFullProfileResult(form: FullProfileFormData, raw: Partial<FullProfileResult> & Record<string, unknown>) {
-  const fallback = generateFullProfile(form);
+export function normalizeFullProfileResult(
+  form: FullProfileFormData,
+  raw: Partial<FullProfileResult> & Record<string, unknown>,
+  todayContext?: Parameters<typeof generateFullProfile>[1],
+) {
+  const fallback = generateFullProfile(form, todayContext);
   const result: FullProfileResult = {
     ...fallback,
     intro: typeof raw.intro === "string" ? raw.intro : fallback.intro,

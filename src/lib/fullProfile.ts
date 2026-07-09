@@ -21,6 +21,19 @@ export type FullProfileTodayContext = {
   statusName: string;
   statusTitle: string;
   statusSummary: string;
+  scores?: Record<string, number>;
+  primaryDimension?: string;
+  secondaryDimension?: string;
+  answerKeys?: string[];
+  traits?: string[];
+  testProfile?: {
+    energyPattern: string;
+    relationshipPattern: string;
+    pressurePattern: string;
+    actionPattern: string;
+    innerTrigger: string;
+    answerPattern: string;
+  };
 };
 
 export type FullProfileSection = {
@@ -215,6 +228,20 @@ export function sanitizeFullProfileResult(result: FullProfileResult): FullProfil
   return sanitized;
 }
 
+function getTodayManifestAura(todayContext?: FullProfileTodayContext) {
+  if (!todayContext?.testProfile) {
+    return `今日显化气场：今天的 10 题测试显示，你当前更接近“${todayContext?.statusName ?? "情绪整理期"}”。这代表此刻浮在表层的状态，主要用于判断你今天怎么反应、怎么消耗、怎么恢复。`;
+  }
+
+  const profile = todayContext.testProfile;
+  const traits = todayContext.traits?.length ? `测试里还显示出这几个特点：${todayContext.traits.join("；")}。` : "";
+  const scoreText = todayContext.scores
+    ? `四项分数呈现为恢复 ${todayContext.scores.recovery ?? 0}、关系 ${todayContext.scores.relationship ?? 0}、行动 ${todayContext.scores.action ?? 0}、流动 ${todayContext.scores.flow ?? 0}，主轴是${todayContext.primaryDimension ?? "当前主轴"}，次轴是${todayContext.secondaryDimension ?? "当前次轴"}。`
+    : "";
+
+  return `今日显化气场：这部分来自你刚才完成的 10 题选择，不是凭空判断。你的能量状态更接近「${profile.energyPattern}」；关系反应更接近「${profile.relationshipPattern}」；压力处理更接近「${profile.pressurePattern}」；行动节奏更接近「${profile.actionPattern}」；今天真正牵动你的内在触发点是「${profile.innerTrigger}」。${scoreText}${traits}所以完整档案会把它作为“今天浮现出来的状态”，再和天生固有气场、最近 30 天状态、关系处境一起合并判断。`;
+}
+
 export function generateFullProfile(form: FullProfileFormData, todayContext?: FullProfileTodayContext): FullProfileResult {
   const city = form.city.trim() || "你所在的城市";
   const privateAreaLabel = "外部环境";
@@ -263,7 +290,8 @@ export function generateFullProfile(form: FullProfileFormData, todayContext?: Fu
   const enhancedEnvironmentImpact = `${environmentImpact}${immersiveDetails.environmentImpact}`;
   const enhancedMasterPrompt = `${masterPrompt}${immersiveDetails.masterPrompt}`;
   const innateAura = `天生固有气场，是根据基础资料推导出的固定命盘倾向。它不代表命运被写死，而是说明你更容易用哪种方式感受世界、回应关系、启动行动。${enhancedFixedAura}`;
-  const acquiredAura = `后天形成气场，是最近状态、关系牵引、现实压力和外部环境共同叠加出来的流动状态。它会随着休息、选择、关系回应和节奏调整而变化。${enhancedCurrentState}`;
+  const manifestAura = getTodayManifestAura(todayContext);
+  const acquiredAura = `后天形成气场，是最近状态、关系牵引、现实压力和外部环境共同叠加出来的流动状态。它会随着休息、选择、关系回应和节奏调整而变化。${enhancedCurrentState}${manifestAura}`;
 
   const sections: FullProfileSection[] = [
     { title: "一、天生固有气场：你的固定命盘倾向", content: innateAura, highlight: "敏感不是缺点，它让你更会照顾人，也更容易察觉问题。" },

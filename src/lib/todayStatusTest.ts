@@ -31,12 +31,22 @@ export type TodayStatusType = {
   appReason: string;
 };
 
+export type TodayTestProfile = {
+  energyPattern: string;
+  relationshipPattern: string;
+  pressurePattern: string;
+  actionPattern: string;
+  innerTrigger: string;
+  answerPattern: string;
+};
+
 export type TodayStatusResult = {
   status: TodayStatusType;
   scores: Record<StatusDimension, number>;
   primaryDimension: StatusDimension;
   secondaryDimension: StatusDimension;
   answerKeys: TestOptionKey[];
+  testProfile: TodayTestProfile;
   completedAt: string;
 };
 
@@ -464,6 +474,64 @@ function getCandidateStatusNames(
   return uniqueStatusNames(expandedPool);
 }
 
+const profileLabels = {
+  energy: {
+    A: "低能恢复型：当前更需要安静回血，身体和情绪都在提醒你先降消耗",
+    B: "情绪压住型：心里有话但暂时不想摊开，更需要被温和理解",
+    C: "行动卡顿型：想推进很多事，但需要先找到最小发力点",
+    D: "轻盈顺势型：状态有流动感，适合保留选择权和自由节奏",
+  },
+  relationship: {
+    A: "自责预警型：关系一有波动，你容易先检查自己是不是哪里没做好",
+    B: "回应确认型：你更在意对方有没有认真回应你、理解你",
+    C: "体面防御型：紧张时会装作没事，但内在其实需要被安抚",
+    D: "顺其自然型：你更愿意先观察，不急着把关系下结论",
+  },
+  pressure: {
+    A: "硬撑消化型：压力来时会先扛住，等独处时才释放真实感受",
+    B: "求助犹豫型：想找人说，又担心打扰别人或显得麻烦",
+    C: "解决导向型：压力越来，你越想立刻处理、重新掌控局面",
+    D: "延后恢复型：你需要先把状态放回来，再决定怎么处理压力",
+  },
+  action: {
+    A: "期待承压型：你最想逃离被期待，行动容易被责任感牵住",
+    B: "理解补能型：你需要被理解，一旦有人接住你，行动感会回来",
+    C: "目标推进型：你需要行动力和明确目标，越清晰越能推进",
+    D: "自由调频型：你需要自由感，太多安排会削弱你的内在能量",
+  },
+  trigger: {
+    A: "情绪守护型：今天最容易被自身情绪波动牵动，需要先守住内在稳定",
+    B: "关系牵引型：今天最容易被一段关系牵动，回应和距离会影响你",
+    C: "目标牵引型：今天最容易被目标结果牵动，成败感会影响你",
+    D: "自由牵引型：今天最容易被自由空间牵动，不想被过度安排",
+  },
+} satisfies Record<string, Record<TestOptionKey, string>>;
+
+function summarizePair(
+  answerKeys: TestOptionKey[],
+  startIndex: number,
+  labels: Record<TestOptionKey, string>,
+) {
+  const first = answerKeys[startIndex];
+  const second = answerKeys[startIndex + 1];
+
+  if (!first || !second) return "";
+  if (first === second) return labels[first];
+
+  return `${labels[first]}；同时带有「${labels[second]}」的次级牵引`;
+}
+
+function buildTodayTestProfile(answerKeys: TestOptionKey[]): TodayTestProfile {
+  return {
+    energyPattern: summarizePair(answerKeys, 0, profileLabels.energy),
+    relationshipPattern: summarizePair(answerKeys, 2, profileLabels.relationship),
+    pressurePattern: summarizePair(answerKeys, 4, profileLabels.pressure),
+    actionPattern: summarizePair(answerKeys, 6, profileLabels.action),
+    innerTrigger: summarizePair(answerKeys, 8, profileLabels.trigger),
+    answerPattern: answerKeys.join(""),
+  };
+}
+
 export function calculateTodayStatusResult(answerKeys: TestOptionKey[]): TodayStatusResult {
   const scores: Record<StatusDimension, number> = {
     recovery: 0,
@@ -487,6 +555,7 @@ export function calculateTodayStatusResult(answerKeys: TestOptionKey[]): TodaySt
     primaryDimension,
     secondaryDimension,
     answerKeys,
+    testProfile: buildTodayTestProfile(answerKeys),
     completedAt: new Date().toISOString(),
   };
 }

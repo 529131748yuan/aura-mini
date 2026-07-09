@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  generateTodayMasterAnswer,
   getAdjacentStoryCategory,
   getStoryCategoryTabs,
   getTodayQuestionAccess,
@@ -47,16 +46,4 @@ describe("mini experience copy and access", () => {
     expect(getAdjacentStoryCategory(tabs, "工作", "previous")).toBe("感情");
   });
 
-  it("generates a today AI master answer from the current state", () => {
-    const answer = generateTodayMasterAnswer({
-      question: "他为什么突然不回我消息？",
-      statusName: "关系敏感期",
-      resultTitle: "习惯照顾别人，却忘了照顾自己",
-      quote: "你不是越来越脆弱，你只是太久没有被好好接住。",
-    });
-
-    expect(answer).toContain("关系敏感期");
-    expect(answer).toContain("他为什么突然不回我消息");
-    expect(answer).toContain("气场");
-  });
 });
