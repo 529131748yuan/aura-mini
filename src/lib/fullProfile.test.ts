@@ -69,6 +69,10 @@ describe("full profile unlock flow", () => {
     expect(JSON.stringify(result)).toContain("消息没有及时回");
     expect(JSON.stringify(result)).toContain("白天撑住");
     expect(JSON.stringify(result)).toContain("想解释又怕麻烦");
+    expect(JSON.stringify(result)).not.toContain("mock");
+    expect(JSON.stringify(result)).not.toContain("规则推导");
+    expect(JSON.stringify(result)).not.toContain("命运决定论");
+    expect(JSON.stringify(result)).not.toContain("当前先用");
     expect(JSON.stringify(result)).not.toContain("心理学");
     expect(JSON.stringify(result)).not.toContain("心理");
     expect(JSON.stringify(result)).not.toContain("出生信息");
@@ -116,7 +120,7 @@ describe("full profile unlock flow", () => {
     const sanitized = sanitizeFullProfileResult({
       ...legacy,
       subtitle: "结合出生信息、当前状态、地区环境与心理反应，生成报告。",
-      fixedAura: "根据你的出生信息（1992-03-25 01:30，东莞），生成固定气场。",
+      fixedAura: "根据你的出生信息（1992-03-25 01:30，东莞），当前先用 mock 规则推导出一组固定气场倾向，而不是把它写成“命运决定论”。",
       psychology: "三、从心理学看，你为什么会反复这样。",
       sections: [
         { title: "三、从心理学看，你为什么会反复这样", content: "这里有心理推断和出生信息。", highlight: "心理能量" },
@@ -130,6 +134,10 @@ describe("full profile unlock flow", () => {
     expect(text).not.toContain("出生信息");
     expect(text).not.toContain("心理学");
     expect(text).not.toContain("心理");
+    expect(text).not.toContain("mock");
+    expect(text).not.toContain("规则推导");
+    expect(text).not.toContain("命运决定论");
+    expect(text).not.toContain("当前先用");
     expect(text).toContain("从气场流向看");
   });
 });

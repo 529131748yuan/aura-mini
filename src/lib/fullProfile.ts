@@ -195,7 +195,13 @@ function sanitizeReportText(text: string) {
     .replace(/心理推断/g, "气场分析")
     .replace(/心理反应/g, "气场反应")
     .replace(/心理能量/g, "内在能量")
-    .replace(/心理/g, "内在");
+    .replace(/心理/g, "内在")
+    .replace(/当前先用\s*mock\s*规则推导出一组固定气场倾向，而不是把它写成“命运决定论”。?/g, "可以看见一组固定气场倾向。")
+    .replace(/mock\s*天气数据/g, "体感变化")
+    .replace(/mock/g, "气场")
+    .replace(/规则推导/g, "气场校准")
+    .replace(/命运决定论/g, "单一判断")
+    .replace(/当前先用/g, "");
 }
 
 export function sanitizeFullProfileResult(result: FullProfileResult): FullProfileResult {
@@ -254,7 +260,7 @@ export function generateFullProfile(form: FullProfileFormData, todayContext?: Fu
   const weatherMock = city.includes("上海") || city.includes("杭州") || city.includes("苏州") ? "偏闷、湿度较高" : city.includes("北京") || city.includes("天津") ? "偏干、节奏较快" : "温差和体感变化比较明显";
 
   const fixedAura =
-    `根据你填写的基础资料，当前先用 mock 规则推导出一组固定气场倾向，而不是把它写成“命运决定论”。你的底层气场更接近“${seasonTone}”这一类：你不是迟钝的人，恰恰相反，你对关系、语气、氛围变化都很敏感。很多时候别人只是随口一句话，你却会自动开始分析背后的态度。你的情绪反应方式不是立刻爆发，而是先观察、先消化、先判断自己该怎么表现得合适。你的行动力来源更接近“${timeTone}”，当目标清楚、关系稳定、内心有确认感时，你会推进得很稳。你的天生优势是会照顾人、会捕捉细节、能提前发现问题；天生消耗点是容易把别人的反应也算成自己的责任，久了就会进入外表正常、内心消耗的状态。`;
+    `从你的基础资料里，可以看见一组固定气场倾向。你的底层气场更接近“${seasonTone}”这一类：你不是迟钝的人，恰恰相反，你对关系、语气、氛围变化都很敏感。很多时候别人只是随口一句话，你却会自动开始分析背后的态度。你的情绪反应方式不是立刻爆发，而是先观察、先消化、先判断自己该怎么表现得合适。你的行动力来源更接近“${timeTone}”，当目标清楚、关系稳定、内心有确认感时，你会推进得很稳。你的天生优势是会照顾人、会捕捉细节、能提前发现问题；天生消耗点是容易把别人的反应也算成自己的责任，久了就会进入外表正常、内心消耗的状态。`;
 
   const currentState =
     `二、你现在处在什么状态：结合今日测试，你当前更接近“${todayStatusName}”，也就是一个“${todayStatusTitle}”的阶段。${todayStatusSummary} 再叠加你填写的最近 30 天状态“${form.recentState}”、主要困扰“${form.mainConcern}”、当前感情状态“${form.relationshipStatus}”，可以看出你最近不是单纯心情不好，也不是能力下降，而是内在能量被分配到太多地方。你一边要处理现实里的${concern.focus}，一边还要维持体面、回应别人、压住自己的情绪，所以真正让你累的不是某一件事，而是长期处在“既想做好，又不敢完全放松”的拉扯里。${recentFocus} 这类状态会让你变得更敏感，也更容易把外界反馈理解成对自己的评价。你现在最需要的不是继续硬撑，不是马上证明自己没问题，而是重新建立节奏：先把今天最消耗你的事情降下来，再把可控的小行动放回手里。`;
@@ -269,7 +275,7 @@ export function generateFullProfile(form: FullProfileFormData, todayContext?: Fu
     `五、你的情绪和行动节奏：你不是没有行动力，而是不适合在混乱情绪中强行冲刺。你的行动力来自“内在确认感”：当你知道自己为什么做、为谁做、做到什么程度就可以时，你会推进得很稳；但当你一边做事一边怀疑自己，行动力就会被大量内耗吃掉。围绕“${form.mainConcern}”这件事，你最容易被${concern.pressure}影响。情绪稳定时，你能很快进入执行；可一旦关系、评价、结果同时变得不确定，你就会开始拖延、逃避或反复复盘。拖延并不一定是懒，它有时是一种防御机制：只要还没开始，就暂时不用面对失败或否定。适合你的行动方式不是逼自己一天改变很多，而是先做一件能完成的小事，让身体重新体验“我能推进”的感觉，再逐步恢复目标感。`;
 
   const environmentImpact =
-    `六、环境正在怎样影响你：环境不会决定你的命运，但会放大或减弱某些状态。结合${privateAreaLabel}节奏和 mock 天气数据，当前更接近“${weatherMock}”这一类体感。如果最近体感偏闷、湿度较高、通勤或工作节奏又密集，身体本身就更容易进入低能量状态。再叠加睡眠不足、连续沟通、压力任务和情绪拉扯，你会比平时更容易烦躁、敏感、想逃避。这不是你变差了，而是外部环境降低了你的恢复速度。对你来说，天气、外部节奏和社交密度会影响内在能量：当环境嘈杂、信息太多，你会更想退回自己的空间；当环境稳定、边界清楚，你的判断力和行动力会明显回来。接下来几天，不要把所有不舒服都归因于自己，也要看见环境正在消耗你。`;
+    `六、环境正在怎样影响你：环境不会决定你，但会放大或减弱某些状态。结合${privateAreaLabel}节奏和体感变化，当前更接近“${weatherMock}”这一类体感。如果最近体感偏闷、湿度较高、通勤或工作节奏又密集，身体本身就更容易进入低能量状态。再叠加睡眠不足、连续沟通、压力任务和情绪拉扯，你会比平时更容易烦躁、敏感、想逃避。这不是你变差了，而是外部环境降低了你的恢复速度。对你来说，天气、外部节奏和社交密度会影响内在能量：当环境嘈杂、信息太多，你会更想退回自己的空间；当环境稳定、边界清楚，你的判断力和行动力会明显回来。接下来几天，不要把所有不舒服都归因于自己，也要看见环境正在消耗你。`;
 
   const masterPrompt =
     "如果你还有一个放不下的问题：这份档案能帮你看见自己的模式，但真正困住人的，往往是某一段关系、某一个选择、某一个反复出现的问题。如果你想继续追问“他到底怎么想”“我该不该继续”“这份工作要不要换”“为什么我总是被同一种人影响”，就适合把具体问题交给 AI 大师继续拆解；如果这个问题牵涉多年关系、家庭选择或重要转折，也可以在 App 里找真人大师做一对一分析。";
@@ -289,7 +295,7 @@ export function generateFullProfile(form: FullProfileFormData, todayContext?: Fu
   const enhancedEmotionActionPattern = `${emotionActionPattern}${immersiveDetails.emotionActionPattern}`;
   const enhancedEnvironmentImpact = `${environmentImpact}${immersiveDetails.environmentImpact}`;
   const enhancedMasterPrompt = `${masterPrompt}${immersiveDetails.masterPrompt}`;
-  const innateAura = `天生固有气场，是根据基础资料推导出的固定命盘倾向。它不代表命运被写死，而是说明你更容易用哪种方式感受世界、回应关系、启动行动。${enhancedFixedAura}`;
+  const innateAura = `天生固有气场，会呈现出一组相对稳定的固定命盘倾向，说明你更容易用哪种方式感受世界、回应关系、启动行动。${enhancedFixedAura}`;
   const manifestAura = getTodayManifestAura(todayContext);
   const acquiredAura = `后天形成气场，是最近状态、关系牵引、现实压力和外部环境共同叠加出来的流动状态。它会随着休息、选择、关系回应和节奏调整而变化。${enhancedCurrentState}${manifestAura}`;
 
